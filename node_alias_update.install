@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * install file for the node_alias_update module
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function node_alias_update_enable() {
+    $nids = db_query('SELECT nid FROM {node}');
+    foreach($nids as $row){
+        db_merge('pathauto_persist')
+            ->key(array('entity_id' => $row->nid))
+            ->fields(array(
+                'entity_id' => $row->nid,
+                'entity_type' => 'node',
+                'pathauto' => 1
+            ))
+            ->updateFields(array())
+            ->execute();
+    }
+}

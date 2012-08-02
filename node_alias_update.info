@@ -1,0 +1,8 @@
+name = "Node Alias Update"
+description = "Updates node aliases when their taxonomy term changes"
+dependencies[] = pathauto
+dependencies[] = taxonomy
+dependencies[] = pathauto_persist
+files[] = node_alias_update.module
+files[] = node_alias_update.install
+core = 7.x

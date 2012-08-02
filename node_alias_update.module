@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Implements hook_taxonomy_term_update().
+ */
+function node_alias_update_taxonomy_term_update($term) {
+    //Make sure we're only bothering with this when the term's name changes
+    if($term->name != $term->original->name){
+        //get this node's terms
+        $all_nodes = taxonomy_select_nodes($term->tid, False);
+
+        //get all of our child terms' nodes
+        $tree = taxonomy_get_tree($term->vid, $term->tid);
+        foreach($tree as $treeterm){
+            $all_term_nodes = taxonomy_select_nodes($treeterm->tid, False);
+            $all_nodes = array_merge($all_nodes, $all_term_nodes);
+        }
+
+        //only bother doing this if there's any nodes in the term
+        if(count($all_nodes) > 0){
+            $nodes = node_load_multiple($all_nodes);
+            pathauto_node_update_alias_multiple($all_nodes, 'update');
+            //Kill Drupal's cached pages & menus, since some of the links may have changed
+            drupal_flush_all_caches();
+            //Kill varnish's copies too. Can't kill just the pages we changed, since
+            //we need to also get the pages that link to the changed ones
+            if(module_exists("varnish")){
+                varnish_purge_all_pages();
+            }
+        }
+    }
+}
