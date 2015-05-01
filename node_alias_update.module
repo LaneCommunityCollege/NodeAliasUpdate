@@ -5,7 +5,7 @@
  */
 function node_alias_update_taxonomy_term_update($term) {
     //Make sure we're only bothering with this when the term's name changes
-    if($term->name != $term->original->name){
+    if($term->name != $term->original->name || $term->parent != $term->original->parent){
         //get this node's terms
         $all_nodes = taxonomy_select_nodes($term->tid, False);
 
